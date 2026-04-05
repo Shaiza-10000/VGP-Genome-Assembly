@@ -6,7 +6,7 @@ Based on the [Galaxy Training Network](https://training.galaxyproject.org/) tuto
 ---
 
 ## 🧭 Project Overview
-This repository documents the implementation of the **Vertebrate Genomes Project (VGP)** pipeline. The goal is to generate high-quality, chromosome-level, haplotype-phased genome assemblies.
+This repository documents my implementation of the **Vertebrate Genomes Project (VGP)** pipeline. The goal is to generate high-quality, chromosome-level, haplotype-phased genome assemblies.
 
 ### 📊 Data Sources
 * **PacBio HiFi Reads:** Long, highly accurate reads (~10–20 kbp) for contig assembly.
@@ -27,11 +27,11 @@ The pipeline moves from raw reads to a chromosome-scale assembly through four ma
 ## 🔬 Step-by-Step Walkthrough
 
 ### Step 1: Data Upload
-We uploaded HiFi reads (`.fastq.gz`) and Hi-C reads (`.bam`) to the Galaxy history.
+I uploaded HiFi reads (`.fastq.gz`) and Hi-C reads (`.bam`) to my Galaxy history.
 
 ### Step 2: Genome Profiling (K-mer Analysis)
 **Tools:** `Meryl` + `GenomeScope2`  
-We used $k=31$ to analyze the genome properties before assembly.
+I used $k=31$ to analyze the genome properties before assembly.
 
 | Parameter | What it tells us |
 | :--- | :--- |
@@ -44,7 +44,7 @@ We used $k=31$ to analyze the genome properties before assembly.
 
 ### Step 3: Contig Assembly with `hifiasm`
 **Tool:** `hifiasm` (Hi-C phasing mode)  
-Hifiasm builds an overlap graph and resolves haplotype "bubbles" using Hi-C data.
+I used Hifiasm to build an overlap graph and resolve haplotype "bubbles" using Hi-C data.
 
 **Assembly Statistics (via `gfastats`):**
 | Metric | Meaning |
@@ -58,7 +58,7 @@ Hifiasm builds an overlap graph and resolves haplotype "bubbles" using Hi-C data
 
 ### Step 4: Purging Duplicate Sequences
 **Tool:** `purge_dups`  
-This tool identifies "haplotigs" (duplicated regions from both haplotypes in one assembly) based on read coverage and moves them to the alternate assembly.
+I used this tool to identify "haplotigs" (duplicated regions from both haplotypes in one assembly) based on read coverage and moved them to the alternate assembly.
 
 ---
 
@@ -72,7 +72,7 @@ This tool identifies "haplotigs" (duplicated regions from both haplotypes in one
 
 ### Step 6: Hi-C Scaffolding
 **Tools:** `BWA-MEM`, `Samtools`, `PretextMap`  
-We mapped Hi-C reads to the purged assembly to visualize the 3D proximity of contigs.
+I mapped Hi-C reads to the purged assembly to visualize the 3D proximity of contigs.
 
 * **PretextMap:** Generates a heatmap. Bright squares along the diagonal represent contigs that belong to the same chromosome.
 
@@ -88,4 +88,4 @@ We mapped Hi-C reads to the purged assembly to visualize the 3D proximity of con
 | **Hi-C** | A technique capturing 3D genome organization. |
 
 ---
-> **Note:** This project was completed using the [UseGalaxy.org](https://usegalaxy.org) platform.
+> **Note:** This project was completed by me using the [UseGalaxy.org](https://usegalaxy.org) platform.
