@@ -130,17 +130,6 @@ I used Hi-C sequencing to capture physical proximity in the nucleus, allowing me
 | **Haplotig** | A contig representing one haplotype of a heterozygous region. |
 
 ---
-## 📁 Repository Structure
 
-The following directory structure reflects the organization of the project and the location of the analysis outputs used in this documentation:
-
-vgp-galaxy-assembly/
-├── README.md
-└── screenshots/
-    ├── genomescope_profile.png
-    ├── busco_hap1.png
-    ├── busco_hap2.png
-    ├── merqury_hap1_spectra.png
-    └── merqury_hap2_spectra.png
 
 > **Note:** This project was completed as part of a course assignment using the [UseGalaxy.org](https://usegalaxy.org) platform.
