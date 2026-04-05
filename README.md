@@ -1,1 +1,91 @@
-🧬 VGP Genome Assembly on GalaxyCourse Assignment | Vertebrate Genome Project (VGP) Pipeline using UseGalaxy.orgBased on the Galaxy Training Network tutorial.🧭 Project OverviewThis repository documents the implementation of the Vertebrate Genomes Project (VGP) pipeline. The VGP aims to generate error-free, near-complete, and haplotype-phased assemblies for all vertebrate species.Data SourcesPacBio HiFi Reads: Long, high-fidelity reads (~10–20 kbp, >Q20 accuracy) for initial contig construction.Hi-C Reads: Chromatin interaction data used to determine physical proximity, enabling chromosome-level scaffolding.🗺️ Pipeline WorkflowThe assembly process follows four major checkpoints:Genome Profiling: Estimate size, heterozygosity, and repeat content.Contig Assembly: Assemble HiFi reads into phased haplotype contigs.Post-Assembly QC: Remove duplicates and assess biological completeness.Hi-C Scaffolding: Order and orient contigs into full chromosomes.🔬 Step-by-Step ImplementationStep 1: Data UploadThe following datasets were imported into the Galaxy history:HiFi reads (.fastq.gz)Hi-C reads (.bam) (Forward and Reverse)Step 2: Genome Profiling (K-mer Analysis)Tools: Meryl + GenomeScope2We used k-mers ($k=31$) to profile the genome. By analyzing the frequency of these substrings, we derived critical assembly parameters.ParameterFunctionGenome SizeEstimates the total base pairs to parameterize downstream tools.HeterozygosityMeasures the divergence between maternal and paternal haplotypes.Repeat ContentIdentifies the proportion of repetitive DNA that might complicate assembly.Error RateAssesses the quality of the raw sequencing data.Step 3: Contig Assembly with hifiasmTool: hifiasm (Hi-C Phasing Mode)hifiasm builds a string graph where nodes are reads and edges are overlaps. It uses Hi-C data to "untangle" heterozygous bubbles, separating the maternal and paternal lines.Assembly Statistics (via gfastats):| Metric | Definition || :--- | :--- || No. of Contigs | Total assembled pieces (lower is generally better). || Total Length | The sum of all bases; should match the GenomeScope estimate. || N50 | The length of the shortest contig at 50% of the total assembly length. || L50 | The smallest number of contigs whose lengths sum to 50% of the assembly. |Step 4: Purging DuplicatesTool: purge_dupsIn highly heterozygous genomes, "haplotigs" (sequences representing the same locus on different chromosomes) may accidentally end up in the primary assembly. purge_dups re-aligns reads to identify high-coverage regions and moves redundant sequences to an "alternate" file.Step 5: Quality Control (QC)Tools: BUSCO, MerquryWe validated the biological and structural integrity of the assembly:BUSCO: Searches for "Universal Single-Copy Orthologs." A high "Complete" score indicates that essential genes were successfully captured.Merqury: A reference-free evaluator. It compares the k-mers in the final assembly against the original read k-mers to calculate a QV (Quality Value) score.Step 6: Hi-C ScaffoldingTools: BWA-MEM, Samtools, PretextMapHi-C data provides the "map" to link contigs together.Mapping: Align Hi-C reads to the purged assembly.Visualization: Generate a Contact Map using PretextMap.Interpretation:Diagonal line: Indicates strong local interactions.Bright squares: Represent high-frequency interactions between distant contigs, defining a single chromosome.🔑 Glossary of Terms[!TIP]Contig: A continuous DNA sequence without gaps.Scaffold: A collection of contigs linked by gaps (Ns) in a known order.Haplotype: The specific set of alleles inherited from one parent.Hi-C: A proximity-ligation method that captures the 3D architecture of the nucleus.
+# 🧬 VGP Genome Assembly on Galaxy
+**Course Assignment** | *Vertebrate Genome Project (VGP) Pipeline using UseGalaxy.org*
+
+Based on the [Galaxy Training Network](https://training.galaxyproject.org/) tutorial.
+
+---
+
+## 🧭 Project Overview
+This repository documents the implementation of the **Vertebrate Genomes Project (VGP)** pipeline. The goal is to generate high-quality, chromosome-level, haplotype-phased genome assemblies.
+
+### 📊 Data Sources
+* **PacBio HiFi Reads:** Long, highly accurate reads (~10–20 kbp) for contig assembly.
+* **Hi-C Reads:** Chromatin interaction data used for chromosome-scale scaffolding.
+
+---
+
+## 🗺️ Pipeline Overview
+The pipeline moves from raw reads to a chromosome-scale assembly through four main stages:
+
+1. **Genome Profiling** → Estimate size, heterozygosity, and repeat content.
+2. **Contig Assembly** → Assemble HiFi reads into phased haplotype contigs.
+3. **Post-Assembly QC** → Remove duplicates and assess completeness.
+4. **Hi-C Scaffolding** → Order and orient contigs into final chromosomes.
+
+---
+
+## 🔬 Step-by-Step Walkthrough
+
+### Step 1: Data Upload
+We uploaded HiFi reads (`.fastq.gz`) and Hi-C reads (`.bam`) to the Galaxy history.
+
+### Step 2: Genome Profiling (K-mer Analysis)
+**Tools:** `Meryl` + `GenomeScope2`  
+We used $k=31$ to analyze the genome properties before assembly.
+
+| Parameter | What it tells us |
+| :--- | :--- |
+| **Genome size** | Total length (used to parameterize downstream steps). |
+| **Heterozygosity** | How different the two haplotype copies are. |
+| **Repeat content** | Percentage of the genome that is repetitive. |
+| **Error rate** | The quality/cleanliness of the raw reads. |
+
+---
+
+### Step 3: Contig Assembly with `hifiasm`
+**Tool:** `hifiasm` (Hi-C phasing mode)  
+Hifiasm builds an overlap graph and resolves haplotype "bubbles" using Hi-C data.
+
+**Assembly Statistics (via `gfastats`):**
+| Metric | Meaning |
+| :--- | :--- |
+| **No. of contigs** | Total pieces — fewer is better. |
+| **Total length** | Should match the estimated genome size. |
+| **N50** | Half the assembly is in contigs this long or longer. |
+| **L50** | Number of contigs needed to reach the 50% mark. |
+
+---
+
+### Step 4: Purging Duplicate Sequences
+**Tool:** `purge_dups`  
+This tool identifies "haplotigs" (duplicated regions from both haplotypes in one assembly) based on read coverage and moves them to the alternate assembly.
+
+---
+
+### Step 5: Assembly Quality Control
+**Tools:** `BUSCO`, `Merqury`
+
+* **BUSCO:** Measures completeness based on conserved genes.
+* **Merqury:** Reference-free assessment using k-mers to find the **QV (Quality Value)**.
+
+---
+
+### Step 6: Hi-C Scaffolding
+**Tools:** `BWA-MEM`, `Samtools`, `PretextMap`  
+We mapped Hi-C reads to the purged assembly to visualize the 3D proximity of contigs.
+
+* **PretextMap:** Generates a heatmap. Bright squares along the diagonal represent contigs that belong to the same chromosome.
+
+---
+
+## 🔑 Key Concepts
+
+| Term | Plain English |
+| :--- | :--- |
+| **Contig** | A continuous piece of DNA with no gaps. |
+| **Scaffold** | Contigs joined in order with gaps (Ns) between them. |
+| **Haplotype** | One of the two copies of each chromosome (maternal/paternal). |
+| **Hi-C** | A technique capturing 3D genome organization. |
+
+---
+> **Note:** This project was completed using the [UseGalaxy.org](https://usegalaxy.org) platform.
